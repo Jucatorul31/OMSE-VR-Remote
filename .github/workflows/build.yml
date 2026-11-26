@@ -10,8 +10,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Dezarhivare proiect
-        run: unzip -o OMSE-VR-Remote.zip
+      - name: Dezarhivare proiect (orice .zip din repository)
+        run: |
+          ls -la *.zip
+          f=$(ls *.zip | head -1)
+          echo "Folosesc: $f"
+          unzip -o "$f"
 
       - uses: actions/setup-java@v4
         with:
@@ -23,8 +27,11 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
+          mkdir -p ../out
+          cp app/build/outputs/apk/release/*.apk ../out/
+          ls -la ../out
 
       - uses: actions/upload-artifact@v4
         with:
-          name: OMSE-VR-Remote-apk
-          path: OMSE-VR-Remote/app/build/outputs/apk/release/*.apk
+          name: APK-build-${{ github.run_number }}
+          path: out/*.apk
